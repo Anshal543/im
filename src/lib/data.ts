@@ -1,9 +1,8 @@
-import { createClient } from "@/supabase/client";
+import { supabase } from "@/supabase/client";
 
 const ITEMS_PER_PAGE = 6;
 
 export async function fetchCarsPages(query: string) {
-    const supabase = createClient();
   try {
     const { count, error } = await supabase
       .from('cars')
@@ -26,7 +25,6 @@ export async function fetchCarsPages(query: string) {
 
 
 export async function fetchFilteredCars(query: string, currentPage: number) {
-    const supabase = createClient()
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
   
     try {

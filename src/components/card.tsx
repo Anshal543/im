@@ -12,7 +12,7 @@ interface CarData {
   purchaseprice: number;
   sellprice: number;
   soldon: string | null;
-  images: string[];
+  images: string;
 }
 
 interface CardsProps {
@@ -24,7 +24,7 @@ const Card: React.FC<{ car: CarData }> = ({ car }) => {
     <div className="relative max-w-sm rounded-lg overflow-hidden shadow-lg bg-white transition-transform transform hover:scale-105 duration-300">
       {/* Car Image */}
       <div className="relative">
-        <img className="w-full h-48 object-cover" src={car.images[0]} alt={car.name} />
+        <img className="w-full h-48 object-cover" src={car.images} alt={car.name} />
         
         {/* Status Tag (Available or Sold) */}
         <span

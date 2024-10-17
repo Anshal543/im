@@ -13,7 +13,7 @@ interface CarData {
   purchaseprice?: number;
   sellprice: number;
   soldon?: string | null;
-  images: string[];
+  images: string;
 }
 
 interface CardsProps {
@@ -27,7 +27,7 @@ const Card: React.FC<{ car: CarData }> = ({ car }) => {
       <div className="relative">
         <img
           className="w-full h-48 object-cover"
-          src={car.images[0]}
+          src={car.images}
           alt={car.name}
         />
 
