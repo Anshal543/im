@@ -1,24 +1,26 @@
+"use client"
 import { fetchFilteredCars } from "@/lib/data";
 import React from "react";
+import { DeleteInvoice, UpdateInvoice } from "./buttons";
 
 interface CarData {
-  id: number;
+  id: string;
   name: string;
   model: string;
-  year: string;
+  year: number;
   description: string;
   fault: string;
   used: boolean;
-  status: string; // 'available' or 'sold'
-  purchaseprice?: number;
-  sellprice: number;
-  soldon?: string | null;
-  images: string;
+  status: string;
+  purchasePrice?: number;
+  sellPrice: number;
+  soldon?: string;
+  image: string;
 }
 
-interface CardsProps {
-  data: CarData[];
-}
+// interface CardsProps {
+//   data: CarData[];
+// }
 
 const Card: React.FC<{ car: CarData }> = ({ car }) => {
   return (
@@ -27,7 +29,7 @@ const Card: React.FC<{ car: CarData }> = ({ car }) => {
       <div className="relative">
         <img
           className="w-full h-48 object-cover"
-          src={car.images}
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_IMG}${car.image}`}
           alt={car.name}
         />
 
@@ -63,7 +65,11 @@ const Card: React.FC<{ car: CarData }> = ({ car }) => {
       {/* Sell Price */}
       <div className="px-6 py-4">
         <div className="text-lg font-semibold text-gray-800">
-          Sell Price: ${car.sellprice.toLocaleString()}
+          Sell Price: ${car.sellPrice}
+        </div>
+        <div className="flex justify-end gap-2">
+          <UpdateInvoice id={car?.id} />
+          <DeleteInvoice id={car?.id} />
         </div>
       </div>
     </div>

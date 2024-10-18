@@ -1,301 +1,334 @@
 // "use client";
+
 // import { useState } from "react";
-// import { Button } from "@/components/ui/button";
-// import { string } from "zod";
 
-// interface CarFormProps {}
-
-// const CarForm: React.FC<CarFormProps> = () => {
-//   const [formState, setFormState] = useState({
+// const CarUploadForm = () => {
+//   const [formData, setFormData] = useState({
 //     name: "",
 //     model: "",
 //     year: "",
 //     description: "",
 //     fault: "",
-//     purchaseprice: "",
-//     sellprice: "",
+//     used: false,
+//     purchasePrice: "",
+//     sellPrice: "",
 //     status: "available",
 //   });
+//   const [imageFile, setImageFile] = useState<File | null>(null);
+//   const [uploading, setUploading] = useState(false);
 
-//   const [image, setImage] = useState<File | null>(null);
-//   const [state, setState] = useState({
-//     message: string | undefined,
-//     errors: {} as Record<string, string[]>,
-//     type: "",
-//   });
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+//   const handleInputChange = (
+//     e: React.ChangeEvent<
+//       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+//     >
+//   ) => {
 //     const { name, value } = e.target;
-//     setFormState((prev) => ({ ...prev, [name]: value }));
+//     setFormData((prevData) => ({ ...prevData, [name]: value }));
+//   };
+
+//   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     setFormData((prevData) => ({ ...prevData, used: e.target.checked }));
 //   };
 
 //   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0];
-//     if (file) {
-//       setImage(file);
-//     }
+//     setImageFile(e.target.files?.[0] || null);
 //   };
 
-//   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+//   const handleSubmit = async (e: React.FormEvent) => {
 //     e.preventDefault();
-//     setIsSubmitting(true);
+//     setUploading(true);
 
-//     const formData = new FormData();
-//     Object.entries(formState).forEach(([key, value]) => formData.append(key, value));
-//     if (image) {
-//       formData.append("imageUrl", image);
-//       console.log(formData)
-//     }
+//     const formDataToSend = new FormData();
+//     Object.keys(formData).forEach((key) =>
+//       formDataToSend.append(key, (formData as any)[key])
+//     );
+//     if (imageFile) formDataToSend.append("image", imageFile);
 
 //     try {
-//       console.log("enter trycatch")
-//       const response = await fetch("/api/sell-your-car", {
+//       const response = await fetch("/api/cars", {
 //         method: "POST",
-//         body: formData,
+//         body: formDataToSend,
 //       });
-//       console.log("request")
+
 //       const result = await response.json();
-
-//       setState({
-//         type: result.type,
-//         message: result.message,
-//         errors: result.errors || {},
-//       });
-
-//       setIsSubmitting(false);
-//     } catch (error) {
-//       setState({
-//         type: "error",
-//         message: "An error occurred during submission.",
-//         errors: {},
-//       });
-//       setIsSubmitting(false);
+//       console.log(result);
+//       if (result.type === "success") {
+//         alert("Car uploaded successfully!");
+//       } else {
+//         alert(`Error: ${result.message}`);
+//       }
+//     } catch (err) {
+//       console.error("Error:", err);
+//     } finally {
+//       setUploading(false);
 //     }
 //   };
 
 //   return (
-//     <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
-//       {/* Car Name */}
-//       <div>
-//         <label htmlFor="name" className="block text-sm font-medium">
-//           Car Name
-//         </label>
-//         <input
-//           type="text"
-//           name="name"
-//           id="name"
-//           value={formState.name}
-//           onChange={handleChange}
-//           placeholder="Enter car name"
-//           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3"
-//         />
-//         {state.errors?.name && (
-//           <p className="mt-2 text-sm text-red-500">{state.errors.name.join(", ")}</p>
-//         )}
-//       </div>
-
-//       {/* Model */}
-//       <div>
-//         <label htmlFor="model" className="block text-sm font-medium">
-//           Model
-//         </label>
-//         <input
-//           type="text"
-//           name="model"
-//           id="model"
-//           value={formState.model}
-//           onChange={handleChange}
-//           placeholder="Enter car model"
-//           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3"
-//         />
-//         {state.errors?.model && (
-//           <p className="mt-2 text-sm text-red-500">{state.errors.model.join(", ")}</p>
-//         )}
-//       </div>
-
-//       {/* Year */}
-//       <div>
-//         <label htmlFor="year" className="block text-sm font-medium">
-//           Year
-//         </label>
-//         <input
-//           type="text"
-//           name="year"
-//           id="year"
-//           value={formState.year}
-//           onChange={handleChange}
-//           placeholder="Enter car year"
-//           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3"
-//         />
-//         {state.errors?.year && (
-//           <p className="mt-2 text-sm text-red-500">{state.errors.year.join(", ")}</p>
-//         )}
-//       </div>
-
-//       {/* Description */}
-//       <div>
-//         <label htmlFor="description" className="block text-sm font-medium">
-//           Description
-//         </label>
-//         <textarea
-//           name="description"
-//           id="description"
-//           value={formState.description}
-//           onChange={handleChange}
-//           placeholder="Enter car description"
-//           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3"
-//         />
-//         {state.errors?.description && (
-//           <p className="mt-2 text-sm text-red-500">{state.errors.description.join(", ")}</p>
-//         )}
-//       </div>
-
-//       {/* Fault */}
-//       <div>
-//         <label htmlFor="fault" className="block text-sm font-medium">
-//           Fault (if any)
-//         </label>
-//         <input
-//           type="text"
-//           name="fault"
-//           id="fault"
-//           value={formState.fault}
-//           onChange={handleChange}
-//           placeholder="Enter fault"
-//           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3"
-//         />
-//         {state.errors?.fault && (
-//           <p className="mt-2 text-sm text-red-500">{state.errors.fault.join(", ")}</p>
-//         )}
-//       </div>
-
-//       {/* Purchase Price */}
-//       <div>
-//         <label htmlFor="purchaseprice" className="block text-sm font-medium">
-//           Purchase Price
-//         </label>
-//         <input
-//           type="number"
-//           name="purchaseprice"
-//           id="purchaseprice"
-//           value={formState.purchaseprice}
-//           onChange={handleChange}
-//           placeholder="Enter purchase price"
-//           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3"
-//         />
-//         {state.errors?.purchaseprice && (
-//           <p className="mt-2 text-sm text-red-500">{state.errors.purchaseprice.join(", ")}</p>
-//         )}
-//       </div>
-
-//       {/* Sell Price */}
-//       <div>
-//         <label htmlFor="sellprice" className="block text-sm font-medium">
-//           Sell Price
-//         </label>
-//         <input
-//           type="number"
-//           name="sellprice"
-//           id="sellprice"
-//           value={formState.sellprice}
-//           onChange={handleChange}
-//           placeholder="Enter sell price"
-//           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3"
-//         />
-//         {state.errors?.sellprice && (
-//           <p className="mt-2 text-sm text-red-500">{state.errors.sellprice.join(", ")}</p>
-//         )}
-//       </div>
-
-//       {/* Status (Available or Sold) */}
-//       <fieldset>
-//         <legend className="block text-sm font-medium">Status</legend>
-//         <div className="mt-2 space-x-4">
-//           <label className="inline-flex items-center">
-//             <input
-//               type="radio"
-//               name="status"
-//               value="available"
-//               checked={formState.status === "available"}
-//               onChange={handleChange}
-//               className="h-4 w-4 border-gray-300 text-green-600 focus:ring-green-500"
-//             />
-//             <span className="ml-2">Available</span>
+//     <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-lg mt-10">
+//       <h2 className="text-2xl font-semibold text-gray-700 text-center mb-6">
+//         Sell Your Car
+//       </h2>
+//       <form onSubmit={handleSubmit} className="space-y-6">
+//         {/* Car Name */}
+//         <div>
+//           <label
+//             htmlFor="name"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Car Name
 //           </label>
-//           <label className="inline-flex items-center">
-//             <input
-//               type="radio"
-//               name="status"
-//               value="sold"
-//               checked={formState.status === "sold"}
-//               onChange={handleChange}
-//               className="h-4 w-4 border-gray-300 text-red-600 focus:ring-red-500"
-//             />
-//             <span className="ml-2">Sold</span>
-//           </label>
+//           <input
+//             type="text"
+//             name="name"
+//             value={formData.name}
+//             onChange={handleInputChange}
+//             className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+//             placeholder="Enter car name"
+//             required
+//           />
 //         </div>
-//         {state.errors?.status && (
-//           <p className="mt-2 text-sm text-red-500">{state.errors.status.join(", ")}</p>
-//         )}
-//       </fieldset>
 
-//       {/* Image Upload */}
-//       <div>
-//         <label htmlFor="image" className="block text-sm font-medium">
-//           Upload Car Image
-//         </label>
-//         <input
-//           type="file"
-//           id="image"
-//           name="imageUrl"
-//           accept=".jpg,.jpeg,.png,.webp"
-//           onChange={handleImageChange}
-//           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm"
-//         />
-//         {state.errors?.imageUrl && (
-//           <p className="mt-2 text-sm text-red-500">{state.errors.imageUrl.join(", ")}</p>
-//         )}
-//       </div>
+//         {/* Model */}
+//         <div>
+//           <label
+//             htmlFor="model"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Model
+//           </label>
+//           <input
+//             type="text"
+//             name="model"
+//             value={formData.model}
+//             onChange={handleInputChange}
+//             className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+//             placeholder="Enter car model"
+//             required
+//           />
+//         </div>
 
-//       {/* Submit Button */}
-//       <div className="flex justify-end">
-//         <Button disabled={isSubmitting} type="submit">
-//           {isSubmitting ? "Creating..." : "Create Car"}
-//         </Button>
-//       </div>
+//         {/* Year */}
+//         <div>
+//           <label
+//             htmlFor="year"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Year
+//           </label>
+//           <input
+//             type="number"
+//             name="year"
+//             value={formData.year}
+//             onChange={handleInputChange}
+//             className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+//             placeholder="Enter car year"
+//             required
+//           />
+//         </div>
 
-//       {/* Feedback Message */}
-//       {state.message && (
-//         <p className={`mt-4 text-sm ${state.type === "success" ? "text-green-500" : "text-red-500"}`}>
-//           {state.message}
-//         </p>
-//       )}
-//     </form>
+//         {/* Description */}
+//         <div>
+//           <label
+//             htmlFor="description"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Description
+//           </label>
+//           <textarea
+//             name="description"
+//             value={formData.description}
+//             onChange={handleInputChange}
+//             className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+//             placeholder="Enter car description"
+//             rows={4}
+//             required
+//           />
+//         </div>
+
+//         {/* Fault */}
+//         <div>
+//           <label
+//             htmlFor="fault"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Fault
+//           </label>
+//           <textarea
+//             name="fault"
+//             value={formData.fault}
+//             onChange={handleInputChange}
+//             className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+//             placeholder="Enter any faults (if applicable)"
+//             rows={2}
+//           />
+//         </div>
+
+//         {/* Used */}
+//         <div className="flex items-center">
+//           <label
+//             htmlFor="used"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Used
+//           </label>
+//           <input
+//             type="checkbox"
+//             name="used"
+//             checked={formData.used}
+//             onChange={handleCheckboxChange}
+//             className="ml-2 h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+//           />
+//         </div>
+
+//         {/* Purchase Price */}
+//         <div>
+//           <label
+//             htmlFor="purchasePrice"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Purchase Price
+//           </label>
+//           <input
+//             type="number"
+//             name="purchasePrice"
+//             value={formData.purchasePrice}
+//             onChange={handleInputChange}
+//             className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+//             placeholder="Enter purchase price"
+//             required
+//           />
+//         </div>
+
+//         {/* Sell Price */}
+//         <div>
+//           <label
+//             htmlFor="sellPrice"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Sell Price
+//           </label>
+//           <input
+//             type="number"
+//             name="sellPrice"
+//             value={formData.sellPrice}
+//             onChange={handleInputChange}
+//             className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+//             placeholder="Enter sell price"
+//           />
+//         </div>
+
+//         {/* Status */}
+//         <div>
+//           <label
+//             htmlFor="status"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Status
+//           </label>
+//           <select
+//             name="status"
+//             value={formData.status}
+//             onChange={handleInputChange}
+//             className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+//             required
+//           >
+//             <option value="available">Available</option>
+//             <option value="sold">Sold</option>
+//           </select>
+//         </div>
+
+//         {/* Image Upload */}
+//         <div>
+//           <label
+//             htmlFor="image"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Upload Image
+//           </label>
+//           <input
+//             type="file"
+//             name="image"
+//             accept="image/*"
+//             onChange={handleImageChange}
+//             required
+//             className="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+//           />
+//         </div>
+
+//         {/* Submit Button */}
+//         <button
+//           type="submit"
+//           className={`w-full p-3 text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+//             uploading ? "opacity-50 cursor-not-allowed" : ""
+//           }`}
+//           disabled={uploading}
+//         >
+//           {uploading ? "Uploading..." : "Submit"}
+//         </button>
+//       </form>
+//     </div>
 //   );
 // };
 
-// export default CarForm;
-'use client';
+// export default CarUploadForm;
 
-import { useState } from 'react';
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const CarUploadForm = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    name: '',
-    model: '',
-    year: '',
-    description: '',
-    fault: '',
+    name: "",
+    model: "",
+    year: "",
+    description: "",
+    fault: "",
     used: false,
-    purchasePrice: '',
-    sellPrice: '',
-    status: 'available',
+    purchasePrice: "",
+    sellPrice: "",
+    status: "available",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  // Zod schema for form validation
+  const carSchema = z.object({
+    name: z.string().min(1, { message: "Car name is required" }),
+    model: z.string().min(1, { message: "Model is required" }),
+    year: z
+      .string()
+      .regex(/^\d{4}$/, { message: "Year must be a 4-digit number" })
+      .transform(Number)
+      .refine((year) => year >= 1886 && year <= new Date().getFullYear(), {
+        message: "Year must be between 1886 and the current year",
+      }),
+    description: z.string().min(1, { message: "Description is required" }),
+    fault: z.string().optional(),
+    used: z.boolean(),
+    purchasePrice: z
+      .string()
+      .regex(/^\d+(\.\d{1,2})?$/, { message: "Invalid purchase price" })
+      .transform(Number),
+    sellPrice: z
+      .string()
+      .regex(/^\d+(\.\d{1,2})?$/, { message: "Invalid sell price" })
+      .optional()
+      .transform(Number)
+      .nullable(),
+    status: z.enum(["available", "sold"]),
+  });
+
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
@@ -311,91 +344,284 @@ const CarUploadForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploading(true);
+    setErrors({});
+
+    // Validate form data with Zod
+    const validationResult = carSchema.safeParse(formData);
+    if (!validationResult.success) {
+      const newErrors: { [key: string]: string } = {};
+      validationResult.error.errors.forEach((error) => {
+        newErrors[error.path[0]] = error.message;
+      });
+      setErrors(newErrors);
+      setUploading(false);
+      return;
+    }
 
     const formDataToSend = new FormData();
-    Object.keys(formData).forEach((key) => formDataToSend.append(key, (formData as any)[key]));
-    if (imageFile) formDataToSend.append('image', imageFile);
+    Object.keys(formData).forEach((key) =>
+      formDataToSend.append(key, (formData as any)[key])
+    );
+    if (imageFile) formDataToSend.append("image", imageFile);
 
     try {
-      const response = await fetch('/api/cars', {
-        method: 'POST',
+      const response = await fetch("/api/cars", {
+        method: "POST",
         body: formDataToSend,
       });
 
-
       const result = await response.json();
-      console.log(result)
-      if (result.type === 'success') {
-        alert('Car uploaded successfully!');
+      console.log(result);
+      if (result.type === "success") {
+        toast.success("Car uploaded successfully!");
+        setTimeout(() => {
+          
+          router.push("/dashboard/manage");
+        }, 1000);
       } else {
-        alert(`Error: ${result.message}`);
+        toast.error(`Error: ${result.message}`);
       }
     } catch (err) {
-      console.error('Error:', err);
+      console.error("Error:", err);
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4">
-      <div className="mb-4">
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-        <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="mt-1 p-2 block w-full border-gray-300 rounded-md shadow-sm" required />
-      </div>
+    <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-lg mt-10">
+      <h2 className="text-2xl font-semibold text-gray-700 text-center mb-6">
+        Sell Your Car
+      </h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Car Name */}
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Car Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+            placeholder="Enter car name"
+            required
+          />
+          {errors.name && (
+            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="model" className="block text-sm font-medium text-gray-700">Model</label>
-        <input type="text" name="model" value={formData.model} onChange={handleInputChange} className="mt-1 p-2 block w-full border-gray-300 rounded-md shadow-sm" required />
-      </div>
+        {/* Model */}
+        <div>
+          <label
+            htmlFor="model"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Model
+          </label>
+          <input
+            type="text"
+            name="model"
+            value={formData.model}
+            onChange={handleInputChange}
+            className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+            placeholder="Enter car model"
+            // required
+          />
+          {errors.model && (
+            <p className="text-red-500 text-sm mt-1">{errors.model}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="year" className="block text-sm font-medium text-gray-700">Year</label>
-        <input type="number" name="year" value={formData.year} onChange={handleInputChange} className="mt-1 p-2 block w-full border-gray-300 rounded-md shadow-sm" required />
-      </div>
+        {/* Year */}
+        <div>
+          <label
+            htmlFor="year"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Year
+          </label>
+          <input
+            type="number"
+            name="year"
+            value={formData.year}
+            onChange={handleInputChange}
+            className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+            placeholder="Enter car year"
+            required
+          />
+          {errors.year && (
+            <p className="text-red-500 text-sm mt-1">{errors.year}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-        <textarea name="description" value={formData.description} onChange={handleInputChange} className="mt-1 p-2 block w-full border-gray-300 rounded-md shadow-sm" required />
-      </div>
+        {/* Description */}
+        <div>
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Description
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+            placeholder="Enter car description"
+            rows={4}
+            // required
+          />
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="fault" className="block text-sm font-medium text-gray-700">Fault</label>
-        <textarea name="fault" value={formData.fault} onChange={handleInputChange} className="mt-1 p-2 block w-full border-gray-300 rounded-md shadow-sm" />
-      </div>
+        {/* Fault */}
+        <div>
+          <label
+            htmlFor="fault"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Fault
+          </label>
+          <textarea
+            name="fault"
+            value={formData.fault}
+            onChange={handleInputChange}
+            className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+            placeholder="Enter any faults (if applicable)"
+            rows={2}
+          />
+          {errors.fault && (
+            <p className="text-red-500 text-sm mt-1">{errors.fault}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="used" className="block text-sm font-medium text-gray-700">Used</label>
-        <input type="checkbox" name="used" checked={formData.used} onChange={handleCheckboxChange} className="mt-1" />
-      </div>
+        {/* Used */}
+        <div className="flex items-center">
+          <label
+            htmlFor="used"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Used
+          </label>
+          <input
+            type="checkbox"
+            name="used"
+            checked={formData.used}
+            onChange={handleCheckboxChange}
+            className="ml-2 h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+          />
+          {errors.used && (
+            <p className="text-red-500 text-sm mt-1">{errors.used}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="purchasePrice" className="block text-sm font-medium text-gray-700">Purchase Price</label>
-        <input type="number" name="purchasePrice" value={formData.purchasePrice} onChange={handleInputChange} className="mt-1 p-2 block w-full border-gray-300 rounded-md shadow-sm" required />
-      </div>
+        {/* Purchase Price */}
+        <div>
+          <label
+            htmlFor="purchasePrice"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Purchase Price
+          </label>
+          <input
+            type="number"
+            name="purchasePrice"
+            value={formData.purchasePrice}
+            onChange={handleInputChange}
+            className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+            placeholder="Enter purchase price"
+            required
+          />
+          {errors.purchasePrice && (
+            <p className="text-red-500 text-sm mt-1">{errors.purchasePrice}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="sellPrice" className="block text-sm font-medium text-gray-700">Sell Price</label>
-        <input type="number" name="sellPrice" value={formData.sellPrice} onChange={handleInputChange} className="mt-1 p-2 block w-full border-gray-300 rounded-md shadow-sm" />
-      </div>
+        {/* Sell Price */}
+        <div>
+          <label
+            htmlFor="sellPrice"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Sell Price
+          </label>
+          <input
+            type="number"
+            name="sellPrice"
+            value={formData.sellPrice}
+            onChange={handleInputChange}
+            className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+            placeholder="Enter sell price"
+          />
+           {errors.sellPrice && (
+            <p className="text-red-500 text-sm mt-1">{errors.sellPrice}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
-        <select name="status" value={formData.status} onChange={handleInputChange} className="mt-1 p-2 block w-full border-gray-300 rounded-md shadow-sm" required>
-          <option value="available">Available</option>
-          <option value="sold">Sold</option>
-        </select>
-      </div>
+        {/* Status */}
+        <div>
+          <label
+            htmlFor="status"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Status
+          </label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleInputChange}
+            className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+            required
+          >
+            <option value="available">Available</option>
+            <option value="sold">Sold</option>
+          </select>
+          {errors.status && (
+            <p className="text-red-500 text-sm mt-1">{errors.status}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="image"  className="block text-sm font-medium text-gray-700">Upload Image</label>
-        <input type="file" name='image'  onChange={handleImageChange} className="mt-1 block w-full" />
-      </div>
+        {/* Image Upload */}
+        <div>
+          <label
+            htmlFor="image"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Upload Image
+          </label>
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleImageChange}
+            required
+            className="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+           {errors.image && (
+            <p className="text-red-500 text-sm mt-1">{errors.image}</p>
+          )}
+        </div>
 
-      <button type="submit" className={`px-4 py-2 text-white bg-blue-600 rounded-md ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={uploading}>
-        {uploading ? 'Uploading...' : 'Submit'}
-      </button>
-    </form>
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className={`w-full p-3 text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+            uploading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={uploading}
+        >
+          {uploading ? "Uploading..." : "Submit"}
+        </button>
+      </form>
+    </div>
   );
 };
 

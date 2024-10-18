@@ -1,18 +1,18 @@
 import React from 'react';
 
 interface CarData {
-  id: number;
+  id: string;
   name: string;
   model: string;
-  year: string;
+  year: number;
   description: string;
   fault: string;
   used: boolean;
-  status: string; // 'available' or 'sold'
-  purchaseprice: number;
-  sellprice: number;
-  soldon: string | null;
-  images: string;
+  status: string;
+  purchasePrice: number;
+  sellPrice: number;
+  soldon?: string;
+  image: string;
 }
 
 interface CardsProps {
@@ -24,7 +24,10 @@ const Card: React.FC<{ car: CarData }> = ({ car }) => {
     <div className="relative max-w-sm rounded-lg overflow-hidden shadow-lg bg-white transition-transform transform hover:scale-105 duration-300">
       {/* Car Image */}
       <div className="relative">
-        <img className="w-full h-48 object-cover" src={car.images} alt={car.name} />
+        <img className="w-full h-48 object-cover" 
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_IMG}${car.image}`}
+
+         alt={car.name} />
         
         {/* Status Tag (Available or Sold) */}
         <span
@@ -58,7 +61,7 @@ const Card: React.FC<{ car: CarData }> = ({ car }) => {
       {/* Sell Price */}
       <div className="px-6 py-4">
         <div className="text-lg font-semibold text-gray-800">
-          Sell Price: ${car.sellprice.toLocaleString()}
+          Sell Price: ${car.sellPrice}
         </div>
       </div>
     </div>

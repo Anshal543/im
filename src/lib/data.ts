@@ -1,12 +1,12 @@
 import { supabase } from "@/supabase/client";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 3;
 
 export async function fetchCarsPages(query: string) {
   try {
     const { count, error } = await supabase
       .from('cars')
-      .select('*', { count: 'exact' }) // 'exact' returns the count of rows
+      .select('*', { count: 'exact',head:true }) // 'exact' returns the count of rows
   
       console.log({ count, error });
     if (error) {
@@ -15,7 +15,8 @@ export async function fetchCarsPages(query: string) {
     }
 
     // Calculate total pages based on the count of results
-    const totalPages = Math.ceil(count??0 / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(Number(count??0) / ITEMS_PER_PAGE);
+    console.log(totalPages)
     return totalPages;
   } catch (error) {
     console.error('Supabase Error1:', error);
@@ -39,8 +40,8 @@ export async function fetchFilteredCars(query: string, currentPage: number) {
           fault,
           used,
           status,
-          sellprice,
-          images
+          sellPrice,
+          image
         `)
         .order('year', { ascending: false })  // Sort by year in descending order
         .range(offset, offset + ITEMS_PER_PAGE - 1);

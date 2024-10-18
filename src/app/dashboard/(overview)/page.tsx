@@ -2,7 +2,7 @@ import React from 'react'
 import { supabase } from '@/supabase/client'
 import Cards from '@/components/card'
 
-export const revalidate = 3600
+export const revalidate = 0
 
 const Home = async() => {
   const {data, error} = await supabase.from('cars').select('*')
