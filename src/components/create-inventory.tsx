@@ -314,7 +314,7 @@ const CarUploadForm = () => {
 
     const formDataToSend = new FormData();
     Object.keys(formData).forEach((key) => formDataToSend.append(key, (formData as any)[key]));
-    // if (imageFile) formDataToSend.append('image', imageFile);
+    if (imageFile) formDataToSend.append('image', imageFile);
 
     try {
       const response = await fetch('/api/cars', {
@@ -387,10 +387,10 @@ const CarUploadForm = () => {
         </select>
       </div>
 
-      {/* <div className="mb-4">
-        <label htmlFor="image" className="block text-sm font-medium text-gray-700">Upload Image</label>
-        <input type="file" accept='image/*' onChange={handleImageChange} className="mt-1 block w-full" />
-      </div> */}
+      <div className="mb-4">
+        <label htmlFor="image"  className="block text-sm font-medium text-gray-700">Upload Image</label>
+        <input type="file" name='image'  onChange={handleImageChange} className="mt-1 block w-full" />
+      </div>
 
       <button type="submit" className={`px-4 py-2 text-white bg-blue-600 rounded-md ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={uploading}>
         {uploading ? 'Uploading...' : 'Submit'}

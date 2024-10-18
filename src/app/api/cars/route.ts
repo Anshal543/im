@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/supabase/client';
+// import { supabase } from '@/supabase/client';
+import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+
 
 export async function POST(request: Request) {
 
@@ -15,19 +18,30 @@ export async function POST(request: Request) {
   const sellPrice = formData.get('sellPrice') as string;
   const used = formData.get('used') === 'true';
   const status = formData.get('status') as string;
-  // const imageFile = formData.get('image') as File;
+  const imageFile = formData.get('image') as File;
 
   try {
     // Upload image to Supabase Storage
-    // const fileName = `${Date.now()}-${imageFile.name}`;
-    // const { data: imageData, error: imageError } = await supabase.storage
-    //   .from('cars')
-    //   .upload(fileName, imageFile);
-
-    // if (imageError) {
-    //   return NextResponse.json({ type: 'error', message: 'Failed to upload image' });
-    // }
-
+    let imageUrl = null
+    
+    const fileName = `${Date.now()}-${imageFile.name}`;
+    const supabase = createServerActionClient({cookies})
+    const { data: imageData, error: imageError } = await supabase.storage
+      .from('cars')
+      .upload(fileName, imageFile, {
+        cacheControl: '3600',
+        upsert: false,
+      }
+      );
+      console.log(imageError,"image error")
+    if (imageError) {
+      return NextResponse.json({ type: 'error', message: 'Failed to upload image' });
+    }
+    if(imageData){
+      const publicUrl = supabase.storage.from('cars').getPublicUrl(fileName).data.publicUrl
+      console.log(publicUrl,"public url")
+    }
+  
     // Insert car data into Supabase
     const { error: carError } = await supabase
       .from('cars')
@@ -41,7 +55,7 @@ export async function POST(request: Request) {
         sellprice: sellPrice,
         used,
         status,
-        // imageUrl: imageData?.path,
+        imageUrl
       });
 
     if (carError) {
