@@ -1,10 +1,26 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/supabase/client';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+
+interface FormData {
+  name: string;
+  model: string;
+  year: string;
+  description: string;
+  fault: string;
+  used: boolean;
+  purchasePrice: string;
+  sellPrice: string;
+  status: string;
+  image: File | string | null;
+}
 
 const Page = ({ params }: { params: { id: string } }) => {
+  const router = useRouter();
   const id = params.id;
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     model: '',
     year: '',
@@ -17,7 +33,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     image: null,
   });
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch car data on component mount
   useEffect(() => {
@@ -38,10 +54,13 @@ const Page = ({ params }: { params: { id: string } }) => {
   }, [id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type, checked, files } = e.target;
+    const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    const { name, value, type } = target;
+    const checked = target instanceof HTMLInputElement ? target.checked : undefined;
+    const files = target instanceof HTMLInputElement ? target.files : undefined;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : name === 'image' ? files[0] : value,
+      [name]: type === 'checkbox' ? checked : name === 'image' ? files?.[0] : value,
     });
   };
 
@@ -50,7 +69,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     setUploading(true);
 
     // Prepare data for update
-    const updatedData = {
+    const updatedData:Partial<FormData> = {
       name: formData.name,
       model: formData.model,
       year: formData.year,
@@ -63,10 +82,11 @@ const Page = ({ params }: { params: { id: string } }) => {
     };
 
     // Handle image upload if necessary
-    if (formData.image instanceof File) {
+    if (formData?.image instanceof File) {
+      const fileName = `${Date.now()}-${formData.image.name}`;
       const { data, error: uploadError } = await supabase.storage
         .from('cars')
-        .upload(`${formData.image.name}`, formData.image);
+        .upload(fileName, formData.image);
   
       if (uploadError) {
         setUploading(false);
@@ -81,11 +101,12 @@ const Page = ({ params }: { params: { id: string } }) => {
     const { error } = await supabase.from('cars').update(updatedData).eq('id', id);
 
     setUploading(false);
+    router.push('/dashboard/manage');
 
     if (error) {
       setError(error.message);
     } else {
-      alert('Car details updated successfully!');
+      toast.success('Car updated successfully');
     }
   };
 
