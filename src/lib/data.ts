@@ -8,7 +8,6 @@ export async function fetchCarsPages(query: string) {
       .from('cars')
       .select('*', { count: 'exact',head:true }) // 'exact' returns the count of rows
   
-      console.log({ count, error });
     if (error) {
       console.error('Supabase Error1:', error);
       throw new Error('Failed to fetch total number of cars.');
@@ -16,7 +15,6 @@ export async function fetchCarsPages(query: string) {
 
     // Calculate total pages based on the count of results
     const totalPages = Math.ceil(Number(count??0) / ITEMS_PER_PAGE);
-    console.log(totalPages)
     return totalPages;
   } catch (error) {
     console.error('Supabase Error1:', error);

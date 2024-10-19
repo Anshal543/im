@@ -14,6 +14,7 @@ interface FormData {
   purchasePrice: string;
   sellPrice: string;
   status: string;
+  soldon: string;
   image: File | string | null;
 }
 
@@ -31,6 +32,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     sellPrice: '',
     status: 'available',
     image: null,
+    soldon: '',
   });
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +81,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       purchasePrice: formData.purchasePrice,
       sellPrice: formData.sellPrice,
       status: formData.status,
+      soldon: formData.status === 'sold' ? new Date().toISOString() : '',
     };
 
     // Handle image upload if necessary
@@ -240,7 +243,19 @@ const Page = ({ params }: { params: { id: string } }) => {
             <option value="sold">Sold</option>
           </select>
         </div>
-
+        {formData.status === 'sold' && (
+          <div>
+            <label htmlFor="soldon" className="block text-sm font-medium text-gray-700">Sold On</label>
+            <input
+              type="date"
+              name="soldon"
+              value={formData.soldon}
+              onChange={handleInputChange}
+              className="mt-1 p-3 block w-full rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+              required
+            />
+          </div>
+        )}
         {/* Image Upload */}
         <div>
           <label htmlFor="image" className="block text-sm font-medium text-gray-700">Upload Image</label>

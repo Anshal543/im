@@ -371,7 +371,6 @@ const CarUploadForm = () => {
       });
 
       const result = await response.json();
-      console.log(result);
       if (result.type === "success") {
         toast.success("Car uploaded successfully!");
         setTimeout(() => {
